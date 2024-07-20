@@ -1,0 +1,107 @@
+id: labelbase
+title: "Labelbase"
+version: 2.2.2
+release-notes: |
+  * Initial release of Labelbase
+license: MIT
+wrapper-repo: "https://github.com/remcoros/labelbase-startos"
+upstream-repo: "https://github.com/Labelbase/Labelbase"
+support-site: "https://github.com/Labelbase/Labelbase/issues"
+marketing-site: "https://labelbase.space/"
+donation-url: "https://labelbase.space/"
+build: ["make"]
+description:
+  short: Labelbase is a label management service for Bitcoin transactions and addresses.
+  long: |
+    Labelbase provides features for adding labels, importing and exporting labels, and offers a public API for integration with wallets and existing workflows.
+    This ensures that you always have access to the most up-to-date information.
+assets:
+  license: LICENSE
+  icon: icon.png
+  instructions: instructions.md
+main:
+  type: docker
+  image: main
+  entrypoint: "docker_entrypoint.sh"
+  args: []
+  mounts:
+    main: /root/data
+    db: /var/lib/mysql
+  gpu-acceleration: false
+hardware-requirements:
+  arch:
+    - x86_64
+    - aarch64
+health-checks:
+  app-ui:
+    name: Labelbase User Interface
+    success-message: Ready to be visited in a web browser
+    type: script
+config:
+  get:
+    type: script
+  set:
+    type: script
+properties:
+  type: script
+volumes:
+  main:
+    type: data
+  db:
+    type: data
+  compat:
+    type: assets
+interfaces:
+  main:
+    name: Labelbase UI
+    description: Labelbase user interface
+    lan-config:
+      443:
+        ssl: true
+        internal: 8080
+    tor-config:
+      port-mapping:
+        80: "8080"
+    ui: true
+    protocols:
+      - tcp
+      - http
+dependencies: {}
+backup:
+  create:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: /mnt/assets/backup.sh
+    args:
+      - create
+      - /root/data
+      - /var/lib/mysql
+    mounts:
+      BACKUP: /mnt/backup
+      compat: /mnt/assets
+      main: /root/data
+      db: /var/lib/mysql
+  restore:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - restore
+      - /root/data
+      - /var/lib/mysql
+    mounts:
+      BACKUP: /mnt/backup
+      compat: /mnt/assets
+      main: /root/data
+      db: /var/lib/mysql
+migrations:
+  from:
+    "*":
+      type: script
+      args: ["from"]
+  to:
+    "*":
+      type: script
+      args: ["to"]

@@ -1,0 +1,3 @@
+[submodule "Labelbase"]
+	path = Labelbase
+	url = https://github.com/Labelbase/Labelbase.git
