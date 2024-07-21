@@ -124,9 +124,7 @@ else
     cp /app/config.ini /root/data
 fi
 
-python manage.py makemigrations --noinput
 python manage.py migrate --noinput
-python manage.py collectstatic --noinput
 python manage.py process_tasks &
 gunicorn labellabor.wsgi:application -b 127.0.0.1:8000 --reload &
 app_process=$!
