@@ -28,14 +28,19 @@ else
     mysql_install_db --user=mysql --ldata=/var/lib/mysql >/dev/null
 
     # generate the root password
-    export MYSQL_ROOT_PASSWORD=$(pwgen 16 1)
+    if [ "$MYSQL_ROOT_PASSWORD" = "" ]; then
+        export MYSQL_ROOT_PASSWORD=$(pwgen 16 1)
+        echo "[i] MariaDB root Password: $MYSQL_ROOT_PASSWORD"
+    fi
 
     # create a database and give privileges
-    export MYSQL_DATABASE=${MYSQL_DATABASE:-"labelbase"}
-    export MYSQL_USER=${MYSQL_USER:-"ulabelbase"}
-
-    # generate password for app database user
-    export MYSQL_PASSWORD=$(pwgen 16 1)
+    # note: Labelbase has the database and username hardcoded to 'labelbase / ulabelbase' with no way to change that
+    MYSQL_DATABASE=${MYSQL_DATABASE:-"labelbase"}
+    MYSQL_USER=${MYSQL_USER:-"ulabelbase"}
+    if [ "$MYSQL_PASSWORD" = "" ]; then
+        export MYSQL_PASSWORD=$(pwgen 16 1)
+        echo "[i] MariaDB $MYSQL_USER Password: $MYSQL_PASSWORD"
+    fi
 
     tfile=$(mktemp)
     if [ ! -f "$tfile" ]; then

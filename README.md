@@ -23,6 +23,7 @@ Clone the Webtop package repository locally.
 
 ```
 git clone git@github.com:remcoros/labelbase-startos.git
+git submodule update --init
 cd labelbase-startos
 ```
 
