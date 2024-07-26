@@ -86,7 +86,7 @@ backup:
     type: docker
     image: compat
     system: true
-    entrypoint: compat
+    entrypoint: /mnt/assets/backup.sh
     args:
       - restore
       - /root/data
