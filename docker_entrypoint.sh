@@ -124,13 +124,19 @@ cd /app
 if [ -f /root/data/config.ini ]; then
     cp /root/data/config.ini /app
 else
-    echo "Executing manage.py help"
-    python manage.py help
+    python manage.py help >/dev/null
     cp /app/config.ini /root/data
 fi
 
+# prevent premature shutdown while migrations are running
+trap ' ' TERM
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput
+trap - TERM
+
 python manage.py process_tasks &
+app_process_tasks=$!
+
 gunicorn labellabor.wsgi:application -b 127.0.0.1:8000 --reload &
 app_process=$!
 
@@ -146,8 +152,9 @@ _term() {
     echo "Caught TERM signal!"
     kill -TERM "$nginx_process" 2>/dev/null
     kill -TERM "$app_process" 2>/dev/null
+    kill -TERM "$app_process_tasks" 2>/dev/null
     kill -TERM "$db_process" 2>/dev/null
 }
 
 trap _term TERM
-wait $db_process $app_process $nginx_process
+wait $db_process $app_process_tasks $app_process $nginx_process

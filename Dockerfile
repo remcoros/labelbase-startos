@@ -53,8 +53,7 @@ COPY ./Labelbase/django /app
 # create migrations and static files, working around issues with manage.py of Labelbase
 # need to run 'manage.py help' to create a /app/config.ini first
 RUN \
-  MYSQL_PASSWORD=not_used python manage.py help && \
-  python manage.py makemigrations --noinput && \
+  MYSQL_PASSWORD=not_used python manage.py help >/dev/null && \
   python manage.py collectstatic --noinput && \
   rm /app/config.ini
 
